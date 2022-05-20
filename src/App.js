@@ -1,23 +1,25 @@
-import logo from './logo.svg';
-import './App.css';
+import { useEffect, useState } from "react";
+import ResponsiveAppBar from "./components/Header";
+import Container from "@mui/material/Container";
+import Posts from "./components/Posts";
+import { PaginationRounded } from "./utils/index";
+import Button from "@mui/material/Button";
+import AllPosts from "./views/blog";
+import Notfound from "./views/404";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className='App'>
+      <Router>
+        <header className='App-header'>
+          <ResponsiveAppBar />
+        </header>
+        <Routes>
+          <Route path='/blog' element={<AllPosts />}></Route>
+          <Route path='*' element={<Notfound />} />
+        </Routes>
+      </Router>
     </div>
   );
 }
