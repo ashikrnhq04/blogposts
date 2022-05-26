@@ -12,13 +12,33 @@ import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
+import Modal from "./Modal";
+import Signup from "./Signup";
+import { lighten } from "@mui/material";
+import Login from "./Login";
+import { useUserAuth } from "../context/UserAuthContext";
+import { useNavigate } from "react-router";
 
-const pages = ["Products", "Pricing", "Blog"];
-const settings = ["Profile", "Account", "Dashboard", "Logout"];
+const pages = ["Blog"];
+const settings = ["Profile", "Dashboard", "Logout"];
 
 const ResponsiveAppBar = () => {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
+  const [modal, setModal] = React.useState(false);
+  const [login, setLogin] = React.useState(false);
+  const [signup, setSignup] = React.useState(false);
+  const { logOut, user } = useUserAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await logOut();
+      navigate("/");
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -35,8 +55,33 @@ const ResponsiveAppBar = () => {
     setAnchorElUser(null);
   };
 
+  const handleSignupModal = () => {
+    setModal(true);
+  };
+  const handleSigninModalOpen = () => {
+    setModal(true);
+    setLogin(true);
+  };
+  const handleSigninModalClose = () => {
+    setModal(false);
+  };
+
   return (
     <AppBar position='static'>
+      {modal && (
+        <Modal
+          handleClose={handleSigninModalClose}
+          handleOpen={handleSigninModalOpen}
+          post={
+            (login && (
+              <Login login={setLogin} signup={setSignup} modal={setModal} />
+            )) ||
+            (signup && (
+              <Signup signup={setSignup} login={setLogin} modal={setModal} />
+            ))
+          }
+        />
+      )}
       <Container maxWidth='xl'>
         <Toolbar disableGutters>
           <Typography
@@ -113,18 +158,38 @@ const ResponsiveAppBar = () => {
                 key={page}
                 onClick={handleCloseNavMenu}
                 sx={{ my: 2, color: "white", display: "block" }}
-                href={page.toLowerCase()}>
+                href={`/${page.toLowerCase()}`}>
                 {page}
               </Button>
             ))}
           </Box>
 
           <Box sx={{ flexGrow: 0 }}>
-            <Tooltip title='Open settings'>
-              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt='Remy Sharp' src='/static/images/avatar/2.jpg' />
-              </IconButton>
-            </Tooltip>
+            <Box>
+              {user == null && (
+                <Button
+                  onClick={() => {
+                    handleSigninModalOpen();
+                  }}
+                  sx={{ m: "10px" }}
+                  variant='contained'
+                  size='medium'
+                  color='secondary'>
+                  Login
+                </Button>
+              )}
+              {user && (
+                <Tooltip title='Open settings'>
+                  <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                    <Avatar
+                      alt='Remy Sharp'
+                      src='/static/images/avatar/2.jpg'
+                    />
+                  </IconButton>
+                </Tooltip>
+              )}
+            </Box>
+
             <Menu
               sx={{ mt: "45px" }}
               id='menu-appbar'
@@ -142,7 +207,15 @@ const ResponsiveAppBar = () => {
               onClose={handleCloseUserMenu}>
               {settings.map((setting) => (
                 <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography textAlign='center'>{setting}</Typography>
+                  {setting === "Logout" ? (
+                    <Typography
+                      onClick={() => handleLogout()}
+                      textAlign='center'>
+                      Logout
+                    </Typography>
+                  ) : (
+                    <Typography textAlign='center'>{setting}</Typography>
+                  )}
                 </MenuItem>
               ))}
             </Menu>

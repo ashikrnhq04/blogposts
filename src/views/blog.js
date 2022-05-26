@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import Container from "@mui/material/Container";
 import Posts from "../components/Posts";
 import { PaginationRounded } from "../utils/index";
-import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import Snackbar from "@mui/material/Snackbar";
 
@@ -29,13 +28,9 @@ const AllPosts = () => {
     setDeleteSuccess({ ...deleteSuccess, open: false });
   };
 
-  const loadMore = () => {
-    setPostsPerPage(() => postsPerPage + 10);
-  };
   const paginate = (event, value) => {
     setCurrentPage(value);
   };
-  console.log(currentPage);
   const deletePost = async (id) => {
     await fetch(`https://jsonplaceholder.typicode.com/posts/${id}`, {
       method: "DELETE",
@@ -92,28 +87,12 @@ const AllPosts = () => {
           autoHideDuration={1000}
           onClose={snackbarClose}
         />
-        <Box sx={{ textAlign: "center", m: "20px" }}>
-          <Button
-            disabled={
-              postsToLoop.length > postdata.length - 5 ||
-              currentPage === postdata.length / postsPerPage
-                ? true
-                : false
-            }
-            variant='contained'
-            color='info'
-            style={{ margin: "20px" }}
-            onClick={loadMore}
-            size='large'>
-            Load more
-          </Button>
-        </Box>
         <Box
           sx={{
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            mb: "20px",
+            m: "20px",
           }}>
           {postdata.length > postsPerPage && (
             <PaginationRounded

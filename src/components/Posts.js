@@ -7,6 +7,8 @@ import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import LinearProgress from "@mui/material/LinearProgress";
+import Post from "./Post";
+import { useUserAuth } from "../context/UserAuthContext";
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
@@ -22,37 +24,31 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 
 const Posts = ({ postdata, deletepost, loading }) => {
+  const { user, setUser } = useUserAuth();
   return (
     <Box theme>
-      {loading ? (
-        <LinearProgress color='inherit' />
-      ) : postdata.length > 0 ? (
+      {loading && <LinearProgress color='inherit' />}
+      {postdata.length > 0 && (
         <Masonry columns={{ xs: 1, md: 3 }} spacing={3}>
           {postdata.map((post) => (
             <Item key={post.id}>
-              <Typography
-                variant='h2'
-                fontSize={26}
-                fontWeight={700}
-                gutterBottom
-                color={"common.black"}>
-                {post.title[0].toUpperCase() + post.title.slice(1)}
-              </Typography>
-              <Typography gutterBottom variant='body1'>
-                {post.body}
-              </Typography>
-              <Button
-                onClick={() => deletepost(post.id)}
-                variant='contained'
-                color='primary'
-                startIcon={<DeleteOutlineIcon />}>
-                Delete
-              </Button>
+              <Post
+                limit={10}
+                post={post}
+                link={`/blog/${post.title.split(" ").join("-")}`}
+              />
+              {user && (
+                <Button
+                  onClick={() => deletepost(post.id)}
+                  variant='contained'
+                  color='primary'
+                  startIcon={<DeleteOutlineIcon />}>
+                  Delete
+                </Button>
+              )}
             </Item>
           ))}
         </Masonry>
-      ) : (
-        <h4 style={{ textAlign: "center" }}>No post were found!</h4>
       )}
     </Box>
   );
